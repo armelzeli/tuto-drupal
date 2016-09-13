@@ -1,0 +1,3 @@
+core = "7.x"
+description = "An example module to learn how to build form"
+name = "Form example module"

@@ -1,0 +1,86 @@
+<?php
+
+function form_example_menu(){
+
+  $items = array();
+
+  $items['examples/formulaire-de-personnage'] = array(
+  'title' => 'Formulaire personnage',
+  'description' => 'Un formulaire à tester !',
+  'page callback' => 'drupal_get_form',
+  'page arguments' => array('form_example_form'),
+  'access callback' => TRUE
+  );
+
+  $items['examples/liste-des-personnages'] = array(
+    'title' => 'Liste des personnages',
+    'description' => 'La liste de tous les personnages du jeu',
+    'page callback' =>'form_example_view',
+    'access callback' => TRUE
+  );
+
+  return $items;
+}
+
+function form_example_form($form, &$form_state){
+
+  $defaut_lastname = 'Votre nom';
+  $defaut_name = 'Votre prénom';
+
+  $form['lastname'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Nom'),
+    '#default_value' => $defaut_lastname ,
+    '#maxlength' => 128,
+    '#required' => TRUE,
+  );
+
+  $form['name'] = array(
+
+    '#type' => 'textfield',
+    '#title' => t('Prénom'),
+    '#default_value' => $defaut_name,
+    '#maxlength' => 128,
+    '#required' => TRUE,
+  );
+
+  $form['submit_button'] = array(
+    '#type' => 'submit',
+    '#value' => t('Validez'),
+  );
+
+  return $form;
+}
+
+function form_example_form_validate($form, &$form_state){
+
+  if($form_state['values']['lastname'] === 'Votre nom' ||
+  $form_state['values']['name'] === 'Votre prénom' ){
+    form_set_error('lastname', t('Veuillez indiquer votre nom et/ou prénom '));
+  }
+}
+
+function form_example_form_submit($form, &$form_state){
+
+  $person = entity_create('person',array('type' => 'person'));
+  $wrapper = entity_metadata_wrapper('person', $person);
+  $wrapper->field_last_name->set($form_state['values']['lastname']);
+  $wrapper->field_name->set($form_state['values']['name']);
+  $wrapper->save();
+
+}
+
+function form_example_view(){
+
+  $query = new EntityFieldQuery();
+
+  $personnages = $query->entityCondition('entity_type', 'person')
+    ->fieldOrderBy('field_name', 'value', 'ASC')
+    ->execute();
+
+  $nodes = entity_load('person', array_keys($personnages['person']));
+
+  return entity_view('person', $nodes);
+
+}
+
