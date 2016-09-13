@@ -6,3 +6,5 @@ Dans ce module j'ai mis en place les différentes directive que voici :
 - Enregistrement des données saisie dans le form, en BDD
 - Affichage de toutes les entites personnes contenu dans la BDD
 
+J'espère que mon code est correct ^^
+
